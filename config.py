@@ -1,7 +1,8 @@
 VOLATILITY_PATH = "vol.py"
+
 MEMORY_IMAGE = "memory.raw"
 
-YARA_RULES = "rules/malware_rules.yar"
+CAPA_PATH = "capa"
 
 DUMP_DIR = "dumps"
 

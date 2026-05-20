@@ -1,84 +1,122 @@
-from volatility3PluginInit import run_volatility
-from iocIdenitifer import (
+from volatility_runner import run_volatility
+from ioc_parser import (
     extract_suspicious_processes,
-    extract_malfind_regions
+    extract_injected_regions
 )
-from yaraScanner import YaraScanner
-from pefileAnalyzer import PEAnalyzer
 
-from config import VOL_PLUGINS, YARA_RULES
+from pe_analyzer import PEAnalyzer
+from capa_runner import CapaRunner
 
+from config import VOL_PLUGINS
+
+from colorama import init, Fore
 from tabulate import tabulate
-from colorama import Fore, init
+
+import os
 
 init()
 
+def print_banner():
+
+    print(Fore.CYAN + r"""
+ __  __                      _______     _             
+|  \/  | ___ _ __ ___       |__   __| __(_) __ _  __ _ 
+| |\/| |/ _ \ '_ ` _ \ _______| | | '__| |/ _` |/ _` |
+| |  | |  __/ | | | | |______| | | |  | | (_| | (_| |
+|_|  |_|\___|_| |_| |_|      |_| |_|  |_|\__,_|\__, |
+                                                |___/
+""")
+
+
 def main():
+
+    print_banner()
+
+    volatility_results = {}
 
     print(Fore.CYAN + "\n[+] Running Volatility Plugins\n")
 
-    results = {}
-
     for plugin in VOL_PLUGINS:
-        print(Fore.YELLOW + f"[*] Executing: {plugin}")
+
+        print(Fore.YELLOW + f"[*] {plugin}")
 
         data = run_volatility(plugin)
 
         if data:
-            results[plugin] = data
+            volatility_results[plugin] = data
 
-    print(Fore.CYAN + "\n[+] Parsing IOCs\n")
-
-    suspicious_procs = extract_suspicious_processes(
-        results.get("windows.pslist", [])
+    suspicious_processes = extract_suspicious_processes(
+        volatility_results.get("windows.pslist", [])
     )
 
-    suspicious_regions = extract_malfind_regions(
-        results.get("windows.malfind", [])
+    suspicious_regions = extract_injected_regions(
+        volatility_results.get("windows.malfind", [])
     )
 
-    print(Fore.RED + f"[!] Suspicious Processes: {len(suspicious_procs)}")
+    print(Fore.RED + f"\n[!] Suspicious Processes: {len(suspicious_processes)}")
     print(Fore.RED + f"[!] Suspicious Memory Regions: {len(suspicious_regions)}")
 
-    yara_scanner = YaraScanner(YARA_RULES)
     pe_analyzer = PEAnalyzer()
+    capa_runner = CapaRunner()
 
-    print(Fore.CYAN + "\n[+] Analyzing Dumped Files\n")
+    dumped_files = []
 
-    dumped_files = [
-        "dumps/sample1.exe",
-        "dumps/sample2.dll"
-    ]
+    for root, dirs, files in os.walk("dumps"):
 
-    final_results = []
+        for file in files:
 
-    for file in dumped_files:
+            if file.endswith((".exe", ".dll")):
 
-        yara_hits = yara_scanner.scan_file(file)
+                dumped_files.append(
+                    os.path.join(root, file)
+                )
 
-        pe_results = pe_analyzer.analyze(file)
+    results_table = []
 
-        final_results.append({
-            "file": file,
-            "yara_hits": yara_hits,
-            "suspicious_pe": pe_results.get("suspicious", [])
-        })
+    print(Fore.CYAN + "\n[+] Running PE + CAPA Analysis\n")
 
-    print(Fore.CYAN + "\n[+] Final Report\n")
+    for sample in dumped_files:
 
-    table = []
+        print(Fore.YELLOW + f"[*] Analyzing: {sample}")
 
-    for result in final_results:
+        pe_results = pe_analyzer.analyze(sample)
 
-        table.append([
-            result["file"],
-            ", ".join(result["yara_hits"]),
-            ", ".join(result["suspicious_pe"])
+        capa_results = capa_runner.analyze(sample)
+
+        entropy_hits = len(
+            pe_results.get("entropy_flags", [])
+        )
+
+        suspicious_imports = ", ".join(
+            pe_results.get("suspicious_imports", [])
+        )
+
+        capabilities = []
+
+        for cap in capa_results:
+
+            if "name" in cap:
+                capabilities.append(cap["name"])
+
+        top_caps = capabilities[:5]
+
+        results_table.append([
+            os.path.basename(sample),
+            entropy_hits,
+            suspicious_imports,
+            "\n".join(top_caps)
         ])
 
+    print(Fore.CYAN + "\n[+] Analysis Report\n")
+
     print(tabulate(
-        table,
-        headers=["File", "YARA Hits", "PE Indicators"],
+        results_table,
+        headers=[
+            "File",
+            "Entropy Flags",
+            "Suspicious Imports",
+            "Top CAPA Capabilities"
+        ],
         tablefmt="grid"
     ))
 
