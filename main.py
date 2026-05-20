@@ -1,11 +1,11 @@
-from volatility_runner import run_volatility
-from ioc_parser import (
+from volatility3PluginInit import run_volatility
+from iocIdenitifer import (
     extract_suspicious_processes,
     extract_injected_regions
 )
 
-from pe_analyzer import PEAnalyzer
-from capa_runner import CapaRunner
+from pefileAnalyzer import PEAnalyzer
+from capaRunner import CapaRunner
 
 from config import VOL_PLUGINS
 
