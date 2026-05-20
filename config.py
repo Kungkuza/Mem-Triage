@@ -1,6 +1,6 @@
 VOLATILITY_PATH = "vol.py"
 
-MEMORY_IMAGE = "memory.raw"
+MEMORY_IMAGE = "memory.mem"
 
 CAPA_PATH = "capa"
 

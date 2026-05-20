@@ -10,7 +10,6 @@ from capaRunner import CapaRunner
 from config import VOL_PLUGINS
 
 from colorama import init, Fore
-#from tabulate import tabulate
 
 import os
 
