@@ -1,7 +1,7 @@
 from volatility3PluginInit import run_volatility
 from iocIdenitifer import (
     extract_suspicious_processes,
-    extract_injected_regions
+    extract_malfind_regions
 )
 
 from pefileAnalyzer import PEAnalyzer
@@ -10,7 +10,7 @@ from capaRunner import CapaRunner
 from config import VOL_PLUGINS
 
 from colorama import init, Fore
-from tabulate import tabulate
+#from tabulate import tabulate
 
 import os
 
@@ -49,7 +49,7 @@ def main():
         volatility_results.get("windows.pslist", [])
     )
 
-    suspicious_regions = extract_injected_regions(
+    suspicious_regions = extract_malfind_regions(
         volatility_results.get("windows.malfind", [])
     )
 
@@ -108,18 +108,6 @@ def main():
         ])
 
     print(Fore.CYAN + "\n[+] Analysis Report\n")
-
-    print(tabulate(
-        results_table,
-        headers=[
-            "File",
-            "Entropy Flags",
-            "Suspicious Imports",
-            "Top CAPA Capabilities"
-        ],
-        tablefmt="grid"
-    ))
-
 
 if __name__ == "__main__":
     main()
