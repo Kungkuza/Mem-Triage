@@ -13,3 +13,8 @@ VOL_PLUGINS = [
     "windows.dlllist",
     "windows.netscan"
 ]
+
+DUMP_PLUGINS = [
+    "windows.malfind",
+    "windows.pedump"
+]

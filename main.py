@@ -7,7 +7,7 @@ from iocIdenitifer import (
 from pefileAnalyzer import PEAnalyzer
 from capaRunner import CapaRunner
 
-from config import VOL_PLUGINS
+from config import DUMP_PLUGINS, VOL_PLUGINS
 
 from colorama import init, Fore
 
@@ -81,6 +81,11 @@ def main():
 
     #End of print
     #Start of extraction from raw data stream
+
+    print(Fore.CYAN + "\n[+] Extracting malicious binaries from memory image...")
+    from config import DUMP_PLUGINS, DUMP_DIR
+    for dump_plugin in DUMP_PLUGINS:
+        run_volatility(dump_plugin, dump_dir=DUMP_DIR)
 
     pe_analyzer = PEAnalyzer()
     capa_runner = CapaRunner()
