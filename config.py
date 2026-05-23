@@ -12,6 +12,5 @@ VOL_PLUGINS = [
 ]
 
 DUMP_PLUGINS = [
-    "windows.malfind",
-    "windows.pedump"
+    "windows.malfind"
 ]

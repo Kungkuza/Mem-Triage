@@ -31,9 +31,12 @@ def main():
     volatility_results = {}
     print(Fore.CYAN + "\n[+] Running Volatility Plugins\n")
 
+    print(Fore.CYAN + "\n[+] Running Volatility Plugins\n")
+
     for plugin in VOL_PLUGINS:
         print(Fore.YELLOW + f"[*] {plugin}")
-        data = run_volatility(plugin)
+        #Makes Volatility to use "-r json" 
+        data = run_volatility(plugin, dump_mode=False) 
         if data:
             volatility_results[plugin] = data
 
@@ -86,11 +89,6 @@ def main():
     #End of print
     #Start of extraction from raw data stream
 
-    print(Fore.CYAN + "\n[+] Extracting malicious binaries from memory image...")
-    from config import DUMP_PLUGINS, DUMP_DIR
-    for dump_plugin in DUMP_PLUGINS:
-        run_volatility(dump_plugin, dump_dir=DUMP_DIR)
-
     pe_analyzer = PEAnalyzer()
     capa_runner = CapaRunner()
 
@@ -109,39 +107,45 @@ def main():
 
     results_table = []
 
-    print(Fore.CYAN + "\n[+] Running PE + CAPA Analysis\n")
+    print(Fore.CYAN + "\n[+] Running PE + CAPA Analysis on Carved Files...\n")
 
-    for process in suspicious_processes:
-            pid = process.get("pid")
-            process_name = process.get("name")
-            raw_pe_bytes = process.get("raw_bytes")
-            
-            if not raw_pe_bytes or not raw_pe_bytes.startswith(b'MZ'):
-                continue
+    for sample_path in dumped_files:
+        
+        file_name = os.path.basename(sample_path)
+        print(Fore.YELLOW + f"[*] Analyzing File: {file_name}")
 
-            print(Fore.YELLOW + f"[*] Analyzing Streamed Process: {process_name} (PID: {pid})")
+        #files passed to analyzers
+        pe_results = pe_analyzer.analyze(sample_path)
+        capa_results = capa_runner.analyze(sample_path)
 
-            pe_results = pe_analyzer.analyze(raw_pe_bytes)
-            capa_results = capa_runner.analyze(raw_pe_bytes)
+        #pull the results from your tool returns
+        entropy_hits = len(pe_results.get("entropy_flags", [])) if pe_results else 0
+        suspicious_imports = ", ".join(pe_results.get("suspicious_imports", [])) if pe_results else "None"
 
-            entropy_hits = len(pe_results.get("entropy_flags", []))
-            suspicious_imports = ", ".join(pe_results.get("suspicious_imports", []))
-
-            capabilities = []
+        capabilities = []
+        if capa_results:
             for cap in capa_results:
                 if "name" in cap:
                     capabilities.append(cap["name"])
 
-            top_caps = capabilities[:5]
+        top_caps = capabilities[:5]
 
-            results_table.append([
-                f"{process_name}_{pid}.mem_stream",
-                entropy_hits,
-                suspicious_imports,
-                "\n".join(top_caps)
-            ])
+        #Appends to the summary data grid
+        results_table.append([
+            file_name,
+            entropy_hits,
+            suspicious_imports,
+            "\n".join(top_caps) if top_caps else "No major capabilities flagged."
+        ])
 
-    print(Fore.CYAN + "\n[+] Analysis Report\n")
-
+    # Print out final summary report
+    print(Fore.CYAN + "\n[+] Final Analysis Summary Report\n")
+    print(Fore.WHITE + "=" * 90)
+    for row in results_table:
+        print(Fore.WHITE + f"Artifact Target : {row[0]}")
+        print(Fore.WHITE + f"Entropy Flags   : {row[1]}")
+        print(Fore.WHITE + f"Suspicious APIs : {row[2]}")
+        print(Fore.GREEN + f"Capa Behaviors  :\n{row[3]}")
+        print(Fore.WHITE + "=" * 90)
 if __name__ == "__main__":
     main()
