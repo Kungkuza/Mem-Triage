@@ -3,7 +3,7 @@ import subprocess
 import json
 from config import VOLATILITY_PATH, MEMORY_IMAGE, DUMP_DIR
 
-def run_volatility(plugin):
+def run_volatility(plugin dump__mode=False):
     command = [
         "python",
         VOLATILITY_PATH,

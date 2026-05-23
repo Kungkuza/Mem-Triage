@@ -1,9 +1,6 @@
 VOLATILITY_PATH = "C:\\Users\\david\\Documents\\CSC842\\volatility3\\vol.py"
-
 MEMORY_IMAGE = "memory.mem"
-
 CAPA_PATH = "capa"
-
 DUMP_DIR = "dumps"
 
 VOL_PLUGINS = [

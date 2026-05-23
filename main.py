@@ -7,7 +7,7 @@ from iocIdenitifer import (
 from pefileAnalyzer import PEAnalyzer
 from capaRunner import CapaRunner
 
-from config import DUMP_PLUGINS, VOL_PLUGINS
+from config import DUMP_PLUGINS, VOL_PLUGINS, DUMP_DIR
 
 from colorama import init, Fore
 
@@ -16,7 +16,6 @@ import os
 init()
 
 def print_banner():
-
     print(Fore.CYAN + r"""
  __  __                      _______     _             
 |  \/  | ___ _ __ ___       |__   __| __(_) __ _  __ _ 
@@ -65,8 +64,13 @@ def main():
             print(Fore.YELLOW + f"        [+] {name} (PID: {pid})")
     else:
         print(Fore.GREEN + "    --> No suspicious processes flagged.")
-    
+
     print(Fore.RED + f"\n[!] Suspicious Memory Regions Detected: {len(suspicious_regions)}")
+    print(Fore.CYAN + "\n[+] Extracting Malicious Binary Payloads to Disk...\n")
+    for dump_plugin in DUMP_PLUGINS:
+        print(Fore.YELLOW + f"[*] Carving active code layers via: {dump_plugin}")
+        
+        run_volatility(dump_plugin, dump_mode=True)
     
     if suspicious_regions:
         print(Fore.YELLOW + "    --> Flagged Malfind Regions:")
@@ -92,9 +96,6 @@ def main():
 
     print(Fore.RED + f"\n[!] Suspicious Processes: {len(suspicious_processes)}")
     print(Fore.RED + f"[!] Suspicious Memory Regions: {len(suspicious_regions)}")
-
-    pe_analyzer = PEAnalyzer()
-    capa_runner = CapaRunner()
 
     dumped_files = []
 
