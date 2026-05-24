@@ -31,11 +31,9 @@ def main():
     volatility_results = {}
     print(Fore.CYAN + "\n[+] Running Volatility Plugins\n")
 
-    print(Fore.CYAN + "\n[+] Running Volatility Plugins\n")
-
     for plugin in VOL_PLUGINS:
         print(Fore.YELLOW + f"[*] {plugin}")
-        #Makes Volatility to use "-r json" 
+
         data = run_volatility(plugin, dump_mode=False) 
         if data:
             volatility_results[plugin] = data
@@ -70,6 +68,8 @@ def main():
 
     print(Fore.RED + f"\n[!] Suspicious Memory Regions Detected: {len(suspicious_regions)}")
     print(Fore.CYAN + "\n[+] Extracting Malicious Binary Payloads to Disk...\n")
+    
+    #Data stream from Volatility3 is passed to the dump plugins which will carve out the active code layers and write them to disk for further analysis.
     for dump_plugin in DUMP_PLUGINS:
         print(Fore.YELLOW + f"[*] Carving active code layers via: {dump_plugin}")
         
