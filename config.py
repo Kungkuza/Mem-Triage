@@ -1,7 +1,10 @@
-VOLATILITY_PATH = "C:\\Users\\david\\Documents\\CSC842\\volatility3\\vol.py"
-MEMORY_IMAGE = "memory.mem"
-CAPA_PATH = "capa"
-DUMP_DIR = "dumps"
+import os
+from datetime import datetime
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+VOLATILITY_PATH = r"C:\\Users\\david\\Documents\\CSC842\\volatility3\\vol.py"
+CAPA_PATH = r"capa"
 
 VOL_PLUGINS = [
     "windows.pslist",
@@ -14,3 +17,40 @@ VOL_PLUGINS = [
 DUMP_PLUGINS = [
     "windows.malfind"
 ]
+
+def get_unique_dump_dir():
+    """
+    Addresses user feedback. Generates a brand-new, timestamped folder 
+    for the current execution to prevent stale artifacts from cross-contaminating 
+    the current forensic investigation.
+    """
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    unique_dir = os.path.join(BASE_DIR, f"dumps_{timestamp}")
+    os.makedirs(unique_dir, exist_ok=True)
+    return unique_dir os
+from datetime import datetime
+
+
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
+VOLATILITY_PATH = r"C:\Users\david\Documents\CSC842\volatility3\vol.py"
+CAPA_PATH = r"capa"
+
+VOL_PLUGINS = [
+    "windows.pslist",
+    "windows.psscan",
+    "windows.malfind",
+    "windows.dlllist",
+    "windows.netscan"
+]
+
+DUMP_PLUGINS = [
+    "windows.malfind"
+]
+
+def get_unique_dump_dir():
+    
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    unique_dir = os.path.join(BASE_DIR, f"dumps_{timestamp}")
+    os.makedirs(unique_dir, exist_ok=True)
+    return unique_dir

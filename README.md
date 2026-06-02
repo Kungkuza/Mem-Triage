@@ -24,7 +24,7 @@ Use GitBash to supply the dependencies required by typing this within the workin
 
 Change the pathing of the VOLATILITY_PATH variable in config.py to the “\\volatility3\\vol.py” with the correct pathing with double slashes from your system preceding that to allow for vol.py to be used. This is a known item to fix to become dynamic. 
 
-The type of file format needed to be used by Mem-Triag is .mem, download memory dumping tools like FTK Imager to produce this file. 
+The type of file format needed to be used by Mem-Triage is .mem, download memory dumping tools like FTK Imager to produce this file. 
 
 Depending on how this file is titled, modify the value of the MEMORY_IMAGE variable with the name of the .mem file, and move the file into the working directory of the tool. 
 
