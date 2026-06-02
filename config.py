@@ -19,11 +19,7 @@ DUMP_PLUGINS = [
 ]
 
 def get_unique_dump_dir():
-    """
-    Addresses user feedback. Generates a brand-new, timestamped folder 
-    for the current execution to prevent stale artifacts from cross-contaminating 
-    the current forensic investigation.
-    """
+    
     timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
     unique_dir = os.path.join(BASE_DIR, f"dumps_{timestamp}")
     os.makedirs(unique_dir, exist_ok=True)
