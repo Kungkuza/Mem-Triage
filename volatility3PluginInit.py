@@ -1,21 +1,21 @@
 import os
 import subprocess
 import json
-from config import VOLATILITY_PATH, MEMORY_IMAGE, DUMP_DIR
+from config import VOLATILITY_PATH
 
-def run_volatility(plugin, dump_mode=False):
+def run_volatility(plugin, image_path, dump_mode=False, dump_dir=None):
     command = [
         "python",
         VOLATILITY_PATH,
         "-f",
-        MEMORY_IMAGE
+        image_path
     ]
 
     # Explicitly branch using the dump_mode parameter passed by main.py
     if dump_mode:
-        if not os.path.exists(DUMP_DIR):
-            os.makedirs(DUMP_DIR)
-        command.extend(["-o", DUMP_DIR, plugin, "--dump"])
+        if not os.path.exists(dump_dir):
+            os.makedirs(dump_dir)
+        command.extend(["-o", dump_dir, plugin, "--dump"])
     else:
         command.extend(["-r", "json", plugin])
 

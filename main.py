@@ -58,7 +58,7 @@ def main():
     print(Fore.MAGENTA + "\n[DUMPING RAW VOLATILITY DATA STRUCTURES]")
     for plugin_name, raw_data in volatility_results.items():
         print(Fore.MAGENTA + f"\n--- Raw Data Object for {plugin_name} ---")
-        print(Fore.WHITE + str(raw_data)[:2000]) # Shortened display output
+        print(Fore.WHITE + str(raw_data)[:2000]) # Shortened output
     print(Fore.MAGENTA + "-----------------------------------------\n")
 
     # 3. Extraction & Whitelist Filtering (Resolving false positive noise)
@@ -132,18 +132,18 @@ def main():
     print(Fore.RED + f"[!] Suspicious Memory Regions Remaining in Queue: {len(suspicious_regions)}")
 
     dumped_files = []
-    # Point os.walk directly into our uniquely generated runtime folder path
     for root, dirs, files in os.walk(active_dump_dir):
         for file in files:
-            if file.endswith((".exe", ".dll")):
-                # Optional step: Extract file metadata to see if it belongs to the target PID if requested
-                if args.pid and f"pid_{args.pid}" not in file.lower() and str(args.pid) not in file:
-                    # Note: Assumes Volatility names carved files containing the PID string identifier
-                    pass
-                dumped_files.append(os.path.join(root, file))
+            # FIX: Remove the strict .exe/.dll requirement. 
+             # Volatility dumps malfind payloads as .dmp, .vac_dump, or extensionless hex files.
+             file_path = os.path.join(root, file)
+                
+             # Ensure it's an actual file and not a subdirectory artifact
+             if os.path.isfile(file_path):
+                    dumped_files.append(file_path)
 
     results_table = []
-    print(Fore.CYAN + "\n[+] Running PE + CAPA Analysis on Carved Files...\n")
+    print(Fore.CYAN + f"\n[+] Running PE + CAPA Analysis on {len(dumped_files)} Carved Files...\n")
 
     for sample_path in dumped_files:
         file_name = os.path.basename(sample_path)

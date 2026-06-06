@@ -3,7 +3,7 @@ from datetime import datetime
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 
-VOLATILITY_PATH = r"C:\\Users\\david\\Documents\\CSC842\\volatility3\\vol.py"
+VOLATILITY_PATH = os.path.normpath(r"C:\Users\DSU\OneDrive - Dakota State University\Documents\GitHub\Mem-Triag\Mem-Triage\volatility3\volatility3\vol.py")
 CAPA_PATH = r"capa"
 
 VOL_PLUGINS = [
