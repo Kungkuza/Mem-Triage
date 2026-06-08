@@ -1,6 +1,6 @@
 Mem-Triage
 Author: David James Garner
-Made with an AI Baseline from ChatGPT
+Made with an AI Baseline from Google Gemini
 
 The set-up process is straightforward. To pull down and use the software please first; 
 
